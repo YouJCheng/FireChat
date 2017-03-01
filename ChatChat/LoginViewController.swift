@@ -1,6 +1,7 @@
 
 
 import UIKit
+import Firebase
 
 class LoginViewController: UIViewController {
   
@@ -22,6 +23,20 @@ class LoginViewController: UIViewController {
   }
   
   @IBAction func loginDidTouch(_ sender: AnyObject) {
+    //check namefield is not empty
+    if nameField?.text != "" {
+        // FireAuth sign in
+        FIRAuth.auth()?.signInAnonymously(completion: { (user, error) in
+            if let err = error {
+                print(err.localizedDescription)
+                return
+            }
+        
+            //If successed, move to ChannelViewController
+            self.performSegue(withIdentifier: "LoginToChat", sender: nil)
+        })
+        
+     }
   }
   
   // MARK: - Notifications
@@ -36,5 +51,14 @@ class LoginViewController: UIViewController {
     bottomLayoutGuideConstraint.constant = 48
   }
   
+    
+ // MARK: Navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        super.prepare(for: segue, sender: sender)
+        let navVC = segue.destination as! UINavigationController
+        let channelVC = navVC.viewControllers.first as! ChannelListViewController
+        
+        channelVC.sendDisplayName = nameField?.text
+    }
 }
 
